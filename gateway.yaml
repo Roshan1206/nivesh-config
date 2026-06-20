@@ -8,8 +8,6 @@ spring:
     name: gateway
   webflux:
     base-path: /nivesh
-  config:
-    import: optional:configserver:http://localhost:8888
   cloud:
     gateway:
       server:

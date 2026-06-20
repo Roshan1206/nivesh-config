@@ -38,8 +38,6 @@ spring:
           starttls:
             enable: true
             required: true
-  config:
-    import: optional:configserver:http://localhost:8888
   kafka:
     bootstrap-servers: localhost:9092
     producer:
