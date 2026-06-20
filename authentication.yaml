@@ -1,0 +1,70 @@
+﻿server:
+  port: 8081
+
+nivesh:
+  auth:
+    url: http://localhost:${server.port}
+    token:
+      onboarded-expiry: 10
+      access-expiry: 15
+      refresh-expiry: 7
+    database:
+      schema: auth
+    cache:
+      lock-duration-in-hour: 5
+      max-attempts: 3
+      max-cache-size: 10000
+
+spring:
+  application:
+    name: authentication
+  datasource:
+    url: jdbc:postgresql://localhost:5432/nivesh?currentSchema=${nivesh.auth.database.schema}
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        default_schema: ${nivesh.auth.database.schema}
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    schemas: ${nivesh.auth.database.schema}
+    location: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true
+  mail:
+    host: smtp.ethereal.email
+    port: 587
+    username: ${MAIL_ID:bonnie33@ethereal.email}
+    password: ${MAIL_PWD:VdEK8XvVHqgYRS9CwG}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+  security:
+    user:
+      name: nivesh
+      password: password
+  data:
+    redis:
+      port: 6379
+      host: localhost
+
+eureka:
+  instance:
+    prefer-ip-address: true
+    ip-address: 127.0.0.1
+    hostname: 127.0.0.1
+    instance-id: ${spring.application.name}:${server.port}
+  client:
+    enabled: true
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka

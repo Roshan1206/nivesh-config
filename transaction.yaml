@@ -1,0 +1,72 @@
+server:
+  port: 8084
+
+nivesh:
+  kafka.enabled: true
+  auth.url: http://localhost:8081
+  account.url: http://localhost:8083
+  transaction.database.schema: txn
+
+spring:
+  application:
+    name: transaction
+  datasource:
+    url: jdbc:postgresql://localhost:5432/nivesh?currentSchema=${nivesh.transaction.database.schema}
+    username: postgres
+    password: password
+  jpa:
+    properties:
+      hibernate:
+        default_schema: ${nivesh.transaction.database.schema}
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    schemas: ${nivesh.transaction.database.schema}
+    location: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true
+  mail:
+    host: smtp.ethereal.email
+    port: 587
+    username: ${MAIL_ID:bonnie33@ethereal.email}
+    password: ${MAIL_PWD:VdEK8XvVHqgYRS9CwG}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+  config:
+    import: optional:configserver:http://localhost:8888
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+    consumer:
+      group-id: transaction-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      properties:
+        spring.json:
+          trusted.packages: "com.nivesh.library.event"
+          add.type.headers: false
+
+eureka:
+  instance:
+    prefer-ip-address: true
+    ip-address: 127.0.0.1
+    hostname: 127.0.0.1
+    instance-id: ${spring.application.name}:${server.port}
+  client:
+    enabled: true
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
